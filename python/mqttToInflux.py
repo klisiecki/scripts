@@ -5,7 +5,7 @@ from typing import NamedTuple
 import paho.mqtt.client as mqtt
 from influxdb import InfluxDBClient
 
-INFLUXDB_ADDRESS = 'localhost'
+INFLUXDB_ADDRESS = '10.0.0.6'
 INFLUXDB_USER = 'openhab'
 INFLUXDB_PASSWORD = 'X9ZYVbLG3uGqqyiUsDWj'
 INFLUXDB_DATABASE = 'openhab_db'
@@ -14,7 +14,6 @@ MQTT_ADDRESS = '10.0.0.6'
 MQTT_USER = 'openhabian'
 MQTT_PASSWORD = 'openhabian'
 MQTT_TOPIC = 'tele/+/SENSOR'
-#MQTT_REGEX = 'home/([^/]+)/([^/]+)'
 MQTT_CLIENT_ID = 'mqttToInflux'
 SYPIALNIA_TEMP_TOPIC = '/ESP_Easy_1/BME280/Temperature'
 
@@ -31,11 +30,13 @@ sensors = {
     "00000A72DB2F": "salon"
 }
 
+
 def on_connect(client, userdata, flags, rc):
     """ The callback for when the client receives a CONNACK response from the server."""
     print('Connected with result code ' + str(rc))
     client.subscribe(MQTT_TOPIC)
     client.subscribe(SYPIALNIA_TEMP_TOPIC)
+
 
 def save_temp(name, temp):
     json_body = [
@@ -51,23 +52,31 @@ def save_temp(name, temp):
     ]
     influxdb_client.write_points(json_body)
 
+
 def on_message(client, userdata, msg):
     """The callback for when a PUBLISH message is received from the server."""
     print(msg.topic + ' -> ' + msg.payload.decode('utf-8'))
-    if (msg.topic == SYPIALNIA_TEMP_TOPIC):
-        save_temp("sypialnia", float(msg.payload.decode('utf-8')))
-    else: 
-        payload = json.loads(msg.payload.decode('utf-8'))
+    payload_raw = msg.payload.decode('utf-8')
+    handle_payload(msg.topic, payload_raw, lambda sensor, temp: save_temp(sensor, temp))
+
+
+def handle_payload(topic, payload_raw, func):
+    if topic == SYPIALNIA_TEMP_TOPIC:
+        save_temp("sypialnia", float(payload_raw))
+    else:
+        payload = json.loads(payload_raw)
         for x in payload:
             data = payload[x]
-            print("reading")
-            print(data)
-            if (type(data) is dict):
-                sensor_id = data['Id']
-                temperature = data['Temperature']
-                print(sensor_id + ' -> ' + str(temperature))
-                if sensor_id in sensors:
-                    save_temp(sensors[sensor_id], temperature)
+            if type(data) is dict:
+                if 'Id' in data:
+                    sensor_id = data['Id']
+                    temperature = data['Temperature']
+                    print(sensor_id + ' -> ' + str(temperature))
+                    if sensor_id in sensors:
+                        func(sensors[sensor_id], temperature)
+                else:
+                    func("garderoba", data['Temperature']) #TODO generic handle
+
 
 def main():
     influxdb_client.switch_database(INFLUXDB_DATABASE)
