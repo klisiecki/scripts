@@ -5,7 +5,7 @@ from typing import NamedTuple
 import paho.mqtt.client as mqtt
 from influxdb import InfluxDBClient
 
-INFLUXDB_ADDRESS = '10.0.0.6'
+INFLUXDB_ADDRESS = 'localhost'
 INFLUXDB_USER = 'openhab'
 INFLUXDB_PASSWORD = 'X9ZYVbLG3uGqqyiUsDWj'
 INFLUXDB_DATABASE = 'openhab_db'
