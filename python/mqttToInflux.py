@@ -16,7 +16,7 @@ MQTT_PASSWORD = 'openhabian'
 MQTT_TOPIC = 'tele/+/SENSOR'
 MQTT_CLIENT_ID = 'mqttToInflux'
 SYPIALNIA_TEMP_TOPIC = '/ESP_Easy_1/BME280/Temperature'
-
+SYPIALNIA_HUM_TOPIC = '/ESP_Easy_1/BME280/Humidity'
 influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD, None)
 
 sensors = {
@@ -39,14 +39,22 @@ def on_connect(client, userdata, flags, rc):
 
 
 def save_temp(name, temp):
+    save_measurement('temperature', name, temp)
+
+
+def save_hum(name, hum):
+    save_measurement('humidity', name, hum)
+
+
+def save_measurement(measurement, name, value):
     json_body = [
         {
-            'measurement': 'temperature',
+            'measurement': measurement,
             'tags': {
                 'name': name
             },
             'fields': {
-                'value': temp
+                'value': value
             }
         }
     ]
@@ -57,12 +65,15 @@ def on_message(client, userdata, msg):
     """The callback for when a PUBLISH message is received from the server."""
     print(msg.topic + ' -> ' + msg.payload.decode('utf-8'))
     payload_raw = msg.payload.decode('utf-8')
-    handle_payload(msg.topic, payload_raw, lambda sensor, temp: save_temp(sensor, temp))
+    handle_payload(msg.topic, payload_raw, lambda sensor, temp: save_temp(sensor, temp),
+                   lambda sensor, temp: save_hum(sensor, temp))
 
 
-def handle_payload(topic, payload_raw, func):
+def handle_payload(topic, payload_raw, temp_func, hum_func):
     if topic == SYPIALNIA_TEMP_TOPIC:
-        save_temp("sypialnia", float(payload_raw))
+        temp_func("sypialnia", float(payload_raw))
+    elif topic == SYPIALNIA_HUM_TOPIC:
+        hum_func("sypialnia", float(payload_raw))
     else:
         payload = json.loads(payload_raw)
         for x in payload:
@@ -73,9 +84,11 @@ def handle_payload(topic, payload_raw, func):
                     temperature = data['Temperature']
                     print(sensor_id + ' -> ' + str(temperature))
                     if sensor_id in sensors:
-                        func(sensors[sensor_id], temperature)
+                        temp_func(sensors[sensor_id], temperature)
                 else:
-                    func("garderoba", data['Temperature']) #TODO generic handle
+                    temp_func("garderoba", data['Temperature'])
+                    hum_func("garderoba", data['Humidity'])
+
 
 
 def main():
