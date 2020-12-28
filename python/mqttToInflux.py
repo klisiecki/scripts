@@ -36,6 +36,7 @@ def on_connect(client, userdata, flags, rc):
     print('Connected with result code ' + str(rc))
     client.subscribe(MQTT_TOPIC)
     client.subscribe(SYPIALNIA_TEMP_TOPIC)
+    client.subscribe(SYPIALNIA_HUM_TOPIC)
 
 
 def save_temp(name, temp):
