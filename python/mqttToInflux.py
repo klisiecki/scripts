@@ -17,6 +17,10 @@ MQTT_TOPIC = 'tele/+/SENSOR'
 MQTT_CLIENT_ID = 'mqttToInflux'
 SYPIALNIA_TEMP_TOPIC = '/ESP_Easy_1/BME280/Temperature'
 SYPIALNIA_HUM_TOPIC = '/ESP_Easy_1/BME280/Humidity'
+
+LAZIENKA_TOPIC = 'tele/tasmota_lazienka/SENSOR'
+GARDEROBA_TOPIC = 'tele/tasmota_garderoba/SENSOR'
+
 influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD, None)
 
 sensors = {
@@ -87,8 +91,14 @@ def handle_payload(topic, payload_raw, temp_func, hum_func):
                     if sensor_id in sensors:
                         temp_func(sensors[sensor_id], temperature)
                 else:
-                    temp_func("garderoba", data['Temperature'])
-                    hum_func("garderoba", data['Humidity'])
+                    if (topic == GARDEROBA_TOPIC):
+                        temp_func("garderoba", data['Temperature'])
+                        hum_func("garderoba", data['Humidity'])
+                    elif (topic == LAZIENKA_TOPIC):
+                        temp_func("lazienka", data['Temperature'])
+                        hum_func("lazienka", data['Humidity'])
+                    else:
+                        print('topic not implemented: ' + topic)
 
 
 
