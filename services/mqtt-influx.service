@@ -1,0 +1,9 @@
+[Unit]
+Description=MQTT to InfluxDB bridge
+After=syslog.target
+[Service]
+ExecStart=python3 /home/openhabian/git/scripts/python/mqttToInflux.py
+Restart=on-failure
+RestartSec=5s
+[Install]
+WantedBy=multi-user.target

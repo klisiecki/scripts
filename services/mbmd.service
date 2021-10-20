@@ -1,0 +1,10 @@
+[Unit]
+Description=MBMD - reads from SDM630 to influx and mqtt
+After=syslog.target
+[Service]
+ExecStart=/home/openhabian/mbmd/mbmd run -d SDM:1 -a /dev/ttyUSB_SDM --api 0.0.0.0:8081 --influx-database openhab_db --influx-url http://localhost:8086 --influx-user openhab --influx-password X9ZYVbLG3uGqqyiUsDWj --influx-interval 10s --mqtt-broker 10.0.0.6:1883 --mqtt-password openhabian --mqtt-user openhabian
+Restart=on-failure
+RestartSec=5s
+[Install]
+WantedBy=multi-user.target
+
