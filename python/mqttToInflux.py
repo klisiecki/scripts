@@ -20,6 +20,7 @@ SYPIALNIA_HUM_TOPIC = '/ESP_Easy_1/BME280/Humidity'
 
 LAZIENKA_TOPIC = 'tele/tasmota_lazienka/SENSOR'
 GARDEROBA_TOPIC = 'tele/tasmota_garderoba/SENSOR'
+TOBI_TOPIC = 'tele/tasmota_tobi/SENSOR'
 
 influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD, None)
 
@@ -97,6 +98,9 @@ def handle_payload(topic, payload_raw, temp_func, hum_func):
                     elif (topic == LAZIENKA_TOPIC):
                         temp_func("lazienka", data['Temperature'])
                         hum_func("lazienka", data['Humidity'])
+                    elif (topic == TOBI_TOPIC):
+                        temp_func("tobi", data['Temperature'])
+                        hum_func("tobi", data['Humidity'])
                     else:
                         print('topic not implemented: ' + topic)
 
