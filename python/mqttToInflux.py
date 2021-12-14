@@ -26,7 +26,7 @@ influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB
 
 sensors = {
     "011438A3D7AA": "czerpnia",
-    "3C01A816882A": "piwnica",
+    "3C01D6070974": "piwnica",
     "01183379C9FF": "bojler_wyzej",
     "011833902FFF": "bojler_nizej",
     "0300A279BDBD": "poddasze_bojler",
