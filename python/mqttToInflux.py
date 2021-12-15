@@ -4,7 +4,7 @@ from typing import NamedTuple
 
 import paho.mqtt.client as mqtt
 
-from influx import save_measurement
+from influx import save_measurement, init_influx
 
 MQTT_ADDRESS = '10.0.0.6'
 MQTT_USER = 'openhabian'
