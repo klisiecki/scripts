@@ -6,10 +6,11 @@ payload2 = '{"Time":"2020-11-15T18:35:34","SHT3X-0x44":{"Temperature":22.1,"Humi
 
 payload3 = '{"Time":"2021-02-14T18:18:54","Switch1":"OFF","BME280":{"Temperature":22.9,"Humidity":33.0,"DewPoint":5.7,"Pressure":1027.4},"PressureUnit":"hPa","TempUnit":"C"}'
 
+payload4 = '{"Time":"2021-12-15T01:11:47","SHT3X":{"Temperature":23.7,"Humidity":50.0,"DewPoint":12.7},"CCS811":{"eCO2":933,"TVOC":81},"VINDRIKTNING":{"PM2.5":0},"TempUnit":"C"}'
+
 def test(payload, topic="/tele/test/SENSOR"):
     print('\ntest:')
-    handle_payload(topic, payload, lambda x, y: print("saving temp " + x + " -> " + str(y)),
-                   lambda x, y: print("saving hum " + x + " -> " + str(y)))
+    handle_payload(topic, payload, lambda p, x, y: print("saving " + p + ": " + x + " -> " + str(y)))
 
 
 test('18.3', '/ESP_Easy_1/BME280/Temperature')
@@ -17,3 +18,5 @@ test('48.5', '/ESP_Easy_1/BME280/Humidity')
 test(payload)
 test(payload2, 'tele/tasmota_garderoba/SENSOR')
 test(payload3, 'tele/tasmota_lazienka/SENSOR')
+test(payload4, 'tele/VINDRIKTNING1/SENSOR')
+

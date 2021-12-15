@@ -17,7 +17,7 @@ SYPIALNIA_HUM_TOPIC = '/ESP_Easy_1/BME280/Humidity'
 LAZIENKA_TOPIC = 'tele/tasmota_lazienka/SENSOR'
 GARDEROBA_TOPIC = 'tele/tasmota_garderoba/SENSOR'
 TOBI_TOPIC = 'tele/tasmota_tobi/SENSOR'
-
+VINDRIKTNING1_TOPIC = 'tele/VINDRIKTNING1/SENSOR'
 
 sensors = {
     "011438A3D7AA": "czerpnia",
@@ -52,15 +52,14 @@ def on_message(client, userdata, msg):
     """The callback for when a PUBLISH message is received from the server."""
     print(msg.topic + ' -> ' + msg.payload.decode('utf-8'))
     payload_raw = msg.payload.decode('utf-8')
-    handle_payload(msg.topic, payload_raw, lambda sensor, temp: save_temp(sensor, temp),
-                   lambda sensor, temp: save_hum(sensor, temp))
+    handle_payload(msg.topic, payload_raw, lambda param, sensor, temp: save_measurement(param, sensor, temp))
 
 
-def handle_payload(topic, payload_raw, temp_func, hum_func):
+def handle_payload(topic, payload_raw, save_func):
     if topic == SYPIALNIA_TEMP_TOPIC:
-        temp_func("sypialnia", float(payload_raw))
+        save_func('temperature', "sypialnia", float(payload_raw))
     elif topic == SYPIALNIA_HUM_TOPIC:
-        hum_func("sypialnia", float(payload_raw))
+        save_func('humidity', 'sypialnia', float(payload_raw))
     else:
         payload = json.loads(payload_raw)
         for x in payload:
@@ -71,17 +70,22 @@ def handle_payload(topic, payload_raw, temp_func, hum_func):
                     temperature = data['Temperature']
                     print(sensor_id + ' -> ' + str(temperature))
                     if sensor_id in sensors:
-                        temp_func(sensors[sensor_id], temperature)
+                        save_func('temperature',sensors[sensor_id], temperature)
                 else:
                     if (topic == GARDEROBA_TOPIC):
-                        temp_func("garderoba", data['Temperature'])
-                        hum_func("garderoba", data['Humidity'])
+                        save_func('temperature',"garderoba", data['Temperature'])
+                        save_func('humidity',"garderoba", data['Humidity'])
                     elif (topic == LAZIENKA_TOPIC):
-                        temp_func("lazienka", data['Temperature'])
-                        hum_func("lazienka", data['Humidity'])
+                        save_func('temperature',"lazienka", data['Temperature'])
+                        save_func('humidity',"lazienka", data['Humidity'])
                     elif (topic == TOBI_TOPIC):
-                        temp_func("tobi", data['Temperature'])
-                        hum_func("tobi", data['Humidity'])
+                        save_func('temperature',"tobi", data['Temperature'])
+                        save_func('humidity',"tobi", data['Humidity'])
+                    elif (topic == VINDRIKTNING1_TOPIC):
+                        if ('eCO2' in data):
+                            save_func('co2', "v1", data['eCO2'])
+                        if ('PM2.5' in data):
+                            save_func('air_quality', "v1", data['PM2.5'])
                     else:
                         print('topic not implemented: ' + topic)
 
