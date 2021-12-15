@@ -83,9 +83,13 @@ def handle_payload(topic, payload_raw, save_func):
                         save_func('humidity',"tobi", data['Humidity'])
                     elif (topic == VINDRIKTNING1_TOPIC):
                         if ('eCO2' in data):
-                            save_func('co2', "v1", data['eCO2'])
+                            save_func('CO2', "v1", data['eCO2'])
+                            save_func('co2', "v1", data['eCO2']) # delete later
                         if ('PM2.5' in data):
-                            save_func('air_quality', "v1", data['PM2.5'])
+                            save_func('PM2_5', "v1", data['PM2.5'])
+                            save_func('air_quality', "v1", data['PM2.5']) # delete later
+                        if ('TVOC' in data):
+                            save_func('TVOC', "v1", data['TVOC'])
                     else:
                         print('topic not implemented: ' + topic)
 
