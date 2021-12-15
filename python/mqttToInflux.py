@@ -3,12 +3,8 @@ import json
 from typing import NamedTuple
 
 import paho.mqtt.client as mqtt
-from influxdb import InfluxDBClient
 
-INFLUXDB_ADDRESS = 'localhost'
-INFLUXDB_USER = 'openhab'
-INFLUXDB_PASSWORD = 'X9ZYVbLG3uGqqyiUsDWj'
-INFLUXDB_DATABASE = 'openhab_db'
+from influx import save_measurement
 
 MQTT_ADDRESS = '10.0.0.6'
 MQTT_USER = 'openhabian'
@@ -22,7 +18,6 @@ LAZIENKA_TOPIC = 'tele/tasmota_lazienka/SENSOR'
 GARDEROBA_TOPIC = 'tele/tasmota_garderoba/SENSOR'
 TOBI_TOPIC = 'tele/tasmota_tobi/SENSOR'
 
-influxdb_client = InfluxDBClient(INFLUXDB_ADDRESS, 8086, INFLUXDB_USER, INFLUXDB_PASSWORD, None)
 
 sensors = {
     "011438A3D7AA": "czerpnia",
@@ -51,20 +46,6 @@ def save_temp(name, temp):
 def save_hum(name, hum):
     save_measurement('humidity', name, hum)
 
-
-def save_measurement(measurement, name, value):
-    json_body = [
-        {
-            'measurement': measurement,
-            'tags': {
-                'name': name
-            },
-            'fields': {
-                'value': value
-            }
-        }
-    ]
-    influxdb_client.write_points(json_body)
 
 
 def on_message(client, userdata, msg):
@@ -107,7 +88,7 @@ def handle_payload(topic, payload_raw, temp_func, hum_func):
 
 
 def main():
-    influxdb_client.switch_database(INFLUXDB_DATABASE)
+    init_influx()
 
     mqtt_client = mqtt.Client(MQTT_CLIENT_ID)
     mqtt_client.username_pw_set(MQTT_USER, MQTT_PASSWORD)
