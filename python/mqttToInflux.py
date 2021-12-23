@@ -93,13 +93,13 @@ def handle_payload(topic, payload_raw, save_func):
 
 def save_vindriktnig(data, name, save_func):
     if ('eCO2' in data):
-        save_func('CO2', "v1", data['eCO2'])
-        save_func('co2', "v1", data['eCO2'])  # delete later
+        save_func('CO2', name, data['eCO2'])
+        save_func('co2', name, data['eCO2'])  # delete later
     if ('PM2.5' in data):
-        save_func('PM2_5', "v1", data['PM2.5'])
-        save_func('air_quality', "v1", data['PM2.5'])  # delete later
+        save_func('PM2_5', name, data['PM2.5'])
+        save_func('air_quality', name, data['PM2.5'])  # delete later
     if ('TVOC' in data):
-        save_func('TVOC', "v1", data['TVOC'])
+        save_func('TVOC', name, data['TVOC'])
 
 
 def main():
