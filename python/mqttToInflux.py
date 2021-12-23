@@ -18,6 +18,8 @@ LAZIENKA_TOPIC = 'tele/tasmota_lazienka/SENSOR'
 GARDEROBA_TOPIC = 'tele/tasmota_garderoba/SENSOR'
 TOBI_TOPIC = 'tele/tasmota_tobi/SENSOR'
 VINDRIKTNING1_TOPIC = 'tele/VINDRIKTNING1/SENSOR'
+VINDRIKTNING2_TOPIC = 'tele/VINDRIKTNING2/SENSOR'
+
 
 sensors = {
     "011438A3D7AA": "czerpnia",
@@ -82,17 +84,22 @@ def handle_payload(topic, payload_raw, save_func):
                         save_func('temperature',"tobi", data['Temperature'])
                         save_func('humidity',"tobi", data['Humidity'])
                     elif (topic == VINDRIKTNING1_TOPIC):
-                        if ('eCO2' in data):
-                            save_func('CO2', "v1", data['eCO2'])
-                            save_func('co2', "v1", data['eCO2']) # delete later
-                        if ('PM2.5' in data):
-                            save_func('PM2_5', "v1", data['PM2.5'])
-                            save_func('air_quality', "v1", data['PM2.5']) # delete later
-                        if ('TVOC' in data):
-                            save_func('TVOC', "v1", data['TVOC'])
+                        save_vindriktnig(data, "v1", save_func)
+                    elif (topic == VINDRIKTNING2_TOPIC):
+                        save_vindriktnig(data, "v2", save_func)
                     else:
                         print('topic not implemented: ' + topic)
 
+
+def save_vindriktnig(data, name, save_func):
+    if ('eCO2' in data):
+        save_func('CO2', "v1", data['eCO2'])
+        save_func('co2', "v1", data['eCO2'])  # delete later
+    if ('PM2.5' in data):
+        save_func('PM2_5', "v1", data['PM2.5'])
+        save_func('air_quality', "v1", data['PM2.5'])  # delete later
+    if ('TVOC' in data):
+        save_func('TVOC', "v1", data['TVOC'])
 
 
 def main():
