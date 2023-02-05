@@ -26,6 +26,7 @@ sensors = {
     "3C01D6070974": "piwnica",
     "01183379C9FF": "bojler_wyzej",
     "011833902FFF": "bojler_nizej",
+    "011453D238AA": "bojler_dol",
     "0300A279BDBD": "poddasze_bojler",
     "0300A279C76C": "strych",
     "0319A2794947": "dach",
